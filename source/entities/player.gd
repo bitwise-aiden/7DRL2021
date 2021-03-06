@@ -14,7 +14,7 @@ func update() -> void:
 	for input in self.INPUT_MAP.keys():
 		if Input.is_action_just_pressed(input):
 			var from = self.position
-			self.position += self.INPUT_MAP[input] * 3
+			self.position += self.INPUT_MAP[input]
 
 			self.emit_signal("move", from, self.position)
 			break
