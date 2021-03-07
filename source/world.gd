@@ -2,12 +2,13 @@ class_name WorldController extends Node
 
 
 onready var layer_entities: TileMap = $entities
-onready var layer_world: TileMap = $navigation/world
+onready var layer_world: TileMap = $world
 onready var line_of_sight: RayCast2D = $line_of_sight
-onready var navigation: Navigation2D = $navigation
 
-var player: PlayerController = null
+
+var can_update: bool = true
 var enemies: Array = []
+var player: PlayerController = null
 
 
 # Lifecycle method
@@ -18,7 +19,8 @@ func _ready() -> void:
 	self.player.initialize(Vector2(27.0, 19.0))
 	self.player.connect("move", self, "__player_move")
 
-	for i in 1:
+	var positions = [Vector2(32.0, 21.0), Vector2(23.0, 16.0)]
+	for i in 2:
 		var enemy = EnemyController.new()
 #		enemy.position = Vector2(randi() % 1280/16, randi() % 720 / 16)
 		enemy.position = Vector2(27.0, 21.0)
@@ -30,17 +32,26 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if !self.can_update:
+		return
+
 	self.player.update()
 
 
 # Private methods
 func __player_move(from: Vector2, to: Vector2) -> void:
-	var position_player: Vector2 = self.__entity_move(from, to, self.player)
+	self.can_update = false
+
+	var position_player: Vector2 = yield(
+		self.__entity_move(from, to, self.player),
+		"completed"
+	)
 
 	for enemy in self.enemies:
 		enemy.update()
-		enemy.telegraph(player, self.line_of_sight, self.navigation)
+		enemy.telegraph(player, self.line_of_sight)
 
+	self.can_update = true
 
 func __entity_move(from: Vector2, to: Vector2, entity: EntityController) -> Vector2:
 	var last_position: Vector2 = from
@@ -50,15 +61,17 @@ func __entity_move(from: Vector2, to: Vector2, entity: EntityController) -> Vect
 	for i in distance:
 		var offset = direction.normalized() * (1 + i)
 
-		if self.layer_world.get_cellv(from + offset) != 6:
+		yield(self.get_tree().create_timer(0.1), "timeout")
+
+		if self.layer_world.get_cellv(from + offset) != TileMap.INVALID_CELL:
 			break
 
+		self.layer_entities.set_cellv(last_position, TileMap.INVALID_CELL)
 		last_position = from + offset
+		self.layer_entities.set_cellv(last_position, 0)
+
 
 	if last_position != to:
 		entity.position = last_position
-
-	self.layer_entities.set_cellv(from, 6)
-	self.layer_entities.set_cellv(last_position, 0)
 
 	return last_position
