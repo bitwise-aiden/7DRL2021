@@ -19,6 +19,31 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://source/helpers/current_queue.gd"
 }, {
+"base": "EntityController",
+"class": "EnemyController",
+"language": "GDScript",
+"path": "res://source/entities/enemy.gd"
+}, {
+"base": "EnemyController",
+"class": "EnemyJumper",
+"language": "GDScript",
+"path": "res://source/entities/enemies/jumper.gd"
+}, {
+"base": "EnemyController",
+"class": "EnemyWanderer",
+"language": "GDScript",
+"path": "res://source/entities/enemies/wanderer.gd"
+}, {
+"base": "Reference",
+"class": "EntityController",
+"language": "GDScript",
+"path": "res://source/entities/controller.gd"
+}, {
+"base": "EntityController",
+"class": "PlayerController",
+"language": "GDScript",
+"path": "res://source/entities/player.gd"
+}, {
 "base": "Reference",
 "class": "PlayerInput",
 "language": "GDScript",
@@ -33,18 +58,35 @@ _global_script_classes=[ {
 "class": "TaskQueue",
 "language": "GDScript",
 "path": "res://source/helpers/tasks/task_queue.gd"
+}, {
+"base": "Node",
+"class": "WorldController",
+"language": "GDScript",
+"path": "res://source/world.gd"
+}, {
+"base": "Reference",
+"class": "WorldInterface",
+"language": "GDScript",
+"path": "res://source/helpers/world_interface.gd"
 } ]
 _global_script_class_icons={
 "BaseTask": "",
 "CurrentQueue": "",
+"EnemyController": "",
+"EnemyJumper": "",
+"EnemyWanderer": "",
+"EntityController": "",
+"PlayerController": "",
 "PlayerInput": "",
 "Task": "",
-"TaskQueue": ""
+"TaskQueue": "",
+"WorldController": "",
+"WorldInterface": ""
 }
 
 [application]
 
-config/name="godot-template"
+config/name="uhhh-helm"
 run/main_scene="res://source/main.tscn"
 config/icon="res://icon.png"
 
@@ -62,6 +104,7 @@ SceneManager="*res://source/autoloads/scene_manager.tscn"
 TaskManager="*res://source/autoloads/task_manager.gd"
 AudioManager="*res://source/autoloads/audio_manager.gd"
 DebugManager="*res://source/autoloads/debug_manager.gd"
+InputManager="*res://source/autoloads/input_manager.gd"
 
 [display]
 
@@ -72,6 +115,10 @@ window/size/test_width=1280
 window/size/test_height=720
 window/stretch/mode="viewport"
 window/stretch/aspect="keep"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "godot_reset" )
 
 [rendering]
 
