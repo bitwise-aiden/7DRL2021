@@ -24,7 +24,7 @@ onready var rooms_script = $Rooms
 func draw_level():
 	rooms.clear()
 	tile_map.clear()
-	
+
 	room_count = ROOM_COUNT[level_number]
 	level_size = Vector2(room_count * 10, room_count * 10) # Fix this so it's not hard coded
 	for x in range(level_size.x):
@@ -32,7 +32,7 @@ func draw_level():
 		for y in range(level_size.y):
 			map[x].append(Tile.Background)
 			tile_map.set_cell(x, y, Tile.Background)
-	
+
 	var free_regions = [Rect2(Vector2(2, 2), level_size - Vector2(4, 4))]
 	for i in range(room_count):
 		draw_room(free_regions)
@@ -44,22 +44,22 @@ func draw_level():
 # Draws all the rooms in the level 18x32-room size 24x38 to have 3 clear rows on each side?
 func draw_room(free_regions):
 	var region = free_regions[randi() % free_regions.size()]
-	
+
 	room_buffer = rooms_script.get_room_tiles()
 	var size_x = room_buffer[1].size()
 	var size_y = room_buffer[0].size()
-	
+
 	var start_x = region.position.x
 	if region.size.x > size_x:
 		start_x += randi() % int(region.size.x - size_x)
-	
+
 	var start_y = region.position.y
 	if region.size.y > size_y:
 		start_y += randi() % int(region.size.y - size_y)
-	
+
 	var room = Rect2(start_x, start_y, size_x, size_y)
 	rooms.append(room)
-	
+
 	# decide for random door placement
 	var door_check = 0
 	while(door_check < 1):
@@ -68,7 +68,7 @@ func draw_room(free_regions):
 		if(room_buffer[r_y][r_x] == "N" || room_buffer[r_y][r_x] == "E" || room_buffer[r_y][r_x] == "W" || room_buffer[r_y][r_x] == "S"):
 			room_buffer[r_y][r_x] = "D"
 			door_check += 1
-	
+
 	# get tile-information from the room_buffer and set the tiles at the right spot.
 	for y in range(room_buffer.size()):
 		for x in range(room_buffer[y - 1].size()):
@@ -83,7 +83,7 @@ func draw_room(free_regions):
 			else:
 				# error tile so we can figure out if we missed something
 				tile_map.set_cell(start_x + x, start_y + y, Tile.Error)
-				
+
 	# split up the remaining free areas
 	cut_regions(free_regions, room)
 
@@ -92,16 +92,16 @@ func draw_room(free_regions):
 func cut_regions(free_regions, region_to_cut):
 	var removal_queue = []
 	var addition_queue = []
-	
+
 	for region in free_regions:
 		if(region.intersects(region_to_cut)):
 			removal_queue.append(region)
-			
+
 			var leftover_left = region_to_cut.position.x - region.position.x - 1
 			var leftover_right = region.end.x - region_to_cut.end.x - 1
 			var leftover_above = region_to_cut.position.y - region.position.y - 1
 			var leftover_below = region.end.y - region_to_cut.end.y - 1
-			
+
 			# Check if there is enough room for a new free region around the newly placed room
 			if(leftover_left >= room_buffer[1].size()):
 				addition_queue.append(Rect2(region.position, Vector2(leftover_left, region.size.y)))
@@ -111,10 +111,10 @@ func cut_regions(free_regions, region_to_cut):
 				addition_queue.append(Rect2(region.position, Vector2(region.size.x, leftover_above)))
 			if(leftover_below >= room_buffer[0].size()):
 				addition_queue.append(Rect2(Vector2(region.position.x, region_to_cut.end.y + 1), Vector2(region.size.x, leftover_below)))
-	
+
 	for region in removal_queue:
 		free_regions.erase(region)
-		
+
 	for region in addition_queue:
 		free_regions.append(region)
 
@@ -125,7 +125,7 @@ func draw_exit():
 		var random = randi() % walls.size()
 		exit = walls[random]
 		tile_map.set_cellv(exit, Tile.Exit)
-		
+
 func draw_path():
 	# graphing all the door tiles
 	var door_graph = AStar2D.new()
@@ -141,7 +141,7 @@ func draw_path():
 	for tile in ground:
 		ground_graph.add_point(j, tile, 1.0)
 		j += 1
-		
+
 	#var path = astar.get_point_path(point_one, point_two)
 	#for position in path:
 		#tile_map.set_cellv(position, Tile.Error)
