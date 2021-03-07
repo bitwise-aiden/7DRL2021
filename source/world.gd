@@ -9,11 +9,17 @@ onready var line_of_sight: RayCast2D = $line_of_sight
 var can_update: bool = true
 var enemies: Array = []
 var player: PlayerController = null
+var __world_interface: WorldInterface = null
 
 
 # Lifecycle method
 func _ready() -> void:
 	randomize()
+
+	self.__world_interface = WorldInterface.new(
+		$line_of_sight,
+		$world
+	)
 
 	self.player = PlayerController.new()
 	self.player.initialize(Vector2(27.0, 19.0))
@@ -52,6 +58,7 @@ func __player_move(from: Vector2, to: Vector2) -> void:
 		enemy.telegraph(player, self.line_of_sight)
 
 	self.can_update = true
+
 
 func __entity_move(from: Vector2, to: Vector2, entity: EntityController) -> Vector2:
 	var last_position: Vector2 = from

@@ -24,6 +24,16 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://source/entities/enemy.gd"
 }, {
+"base": "EnemyController",
+"class": "EnemyJumper",
+"language": "GDScript",
+"path": "res://source/entities/enemies/jumper.gd"
+}, {
+"base": "EnemyController",
+"class": "EnemyWanderer",
+"language": "GDScript",
+"path": "res://source/entities/enemies/wanderer.gd"
+}, {
 "base": "Reference",
 "class": "EntityController",
 "language": "GDScript",
@@ -53,17 +63,25 @@ _global_script_classes=[ {
 "class": "WorldController",
 "language": "GDScript",
 "path": "res://source/world.gd"
+}, {
+"base": "Reference",
+"class": "WorldInterface",
+"language": "GDScript",
+"path": "res://source/helpers/world_interface.gd"
 } ]
 _global_script_class_icons={
 "BaseTask": "",
 "CurrentQueue": "",
 "EnemyController": "",
+"EnemyJumper": "",
+"EnemyWanderer": "",
 "EntityController": "",
 "PlayerController": "",
 "PlayerInput": "",
 "Task": "",
 "TaskQueue": "",
-"WorldController": ""
+"WorldController": "",
+"WorldInterface": ""
 }
 
 [application]
