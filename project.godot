@@ -22,7 +22,7 @@ _global_script_classes=[ {
 "base": "Node2D",
 "class": "Dungeon",
 "language": "GDScript",
-"path": "res://source/dungeon.gd"
+"path": "res://source/world/dungeon.gd"
 }, {
 "base": "EntityController",
 "class": "EnemyController",
@@ -67,12 +67,12 @@ _global_script_classes=[ {
 "base": "Node2D",
 "class": "WorldController",
 "language": "GDScript",
-"path": "res://source/main.gd"
+"path": "res://source/world/world.gd"
 }, {
 "base": "Reference",
 "class": "WorldInterface",
 "language": "GDScript",
-"path": "res://source/helpers/world_interface.gd"
+"path": "res://source/world/world_interface.gd"
 } ]
 _global_script_class_icons={
 "BaseTask": "",

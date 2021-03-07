@@ -1,9 +1,9 @@
 [gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://source/rooms.gd" type="Script" id=1]
+[ext_resource path="res://assets/art/traversable.png" type="Texture" id=1]
 [ext_resource path="res://assets/art/level_one.png" type="Texture" id=2]
-[ext_resource path="res://source/dungeon.gd" type="Script" id=3]
-[ext_resource path="res://assets/art/traversable.png" type="Texture" id=4]
+[ext_resource path="res://source/world/dungeon.gd" type="Script" id=3]
+[ext_resource path="res://source/rooms.gd" type="Script" id=4]
 
 [sub_resource type="TileSet" id=1]
 0/name = "Wall"
@@ -114,7 +114,7 @@
 
 [sub_resource type="TileSet" id=2]
 0/name = "traversable.png 0"
-0/texture = ExtResource( 4 )
+0/texture = ExtResource( 1 )
 0/tex_offset = Vector2( 0, 0 )
 0/modulate = Color( 1, 1, 1, 1 )
 0/region = Rect2( 0, 0, 16, 16 )
@@ -142,4 +142,4 @@ cell_size = Vector2( 16, 16 )
 format = 1
 
 [node name="Rooms" type="Node" parent="."]
-script = ExtResource( 1 )
+script = ExtResource( 4 )

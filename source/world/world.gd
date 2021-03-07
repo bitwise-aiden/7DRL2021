@@ -1,6 +1,7 @@
 class_name WorldController extends Node2D
 
 
+onready var __camera: Camera2D = $camera
 onready var __dungeon: Dungeon = $dungeon
 onready var __entities: TileMap = $entities
 onready var __ray: RayCast2D = $line_of_sight
@@ -30,13 +31,35 @@ func _process(delta: float) -> void:
 
 
 # Private methods
+func __center_camera_on_entity(entity: EntityController, pan: bool = false) -> void:
+	var room: Rect2 = self.__dungeon.get_room_for_entity(entity)
+	if room.size.length() == 0:
+		self.__center_camera_on_position(entity.position)
+	else:
+		self.__center_camera_on_room(room)
+
+
+func __center_camera_on_position(position: Vector2, pan: bool = false) -> void:
+	self.__camera.offset = self.__world_interface.w2s(position)
+
+
+func __center_camera_on_room(room: Rect2, pan: bool = false) -> void:
+	if room.size.length() == 0:
+		return
+
+	var room_center = room.position + room.size * 0.5
+	self.__center_camera_on_position(room_center, pan)
+
+
 func __dungeon_complete() -> void:
 	self.__world_interface = WorldInterface.new(
-		$line_of_sight,
-		$dungeon.get_traversable()
+		self.__ray,
+		self.__dungeon.get_traversable()
 	)
 
 	self.__can_update = true
+
+	self.__center_camera_on_entity(self.__player, false)
 
 
 func __entity_move(from: Vector2, to: Vector2, entity: EntityController) -> Vector2:
@@ -70,6 +93,8 @@ func __player_move(from: Vector2, to: Vector2, entity: EntityController) -> void
 		"completed"
 	)
 
+	self.__center_camera_on_entity(entity)
+
 	for enemy in self.__enemies:
 		enemy.update()
 		enemy.telegraph(entity, self.__world_interface)
@@ -88,8 +113,6 @@ func __spawn_enemy(position: Vector2) -> void:
 
 
 func __spawn_player(position: Vector2) -> void:
-	print(self.__player, position)
-
 	if self.__player != null:
 		Logger.warn("Player already spawned")
 		return
