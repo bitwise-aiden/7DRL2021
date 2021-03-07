@@ -2,8 +2,7 @@
 
 [ext_resource path="res://source/rooms.gd" type="Script" id=1]
 [ext_resource path="res://assets/art/level_one.png" type="Texture" id=2]
-
-[sub_resource type="GDScript" id=1]
+[ext_resource path="res://source/dungeon.gd" type="Script" id=3]
 
 [sub_resource type="TileSet" id=2]
 0/name = "Wall"
@@ -113,7 +112,7 @@
 6/z_index = 0
 
 [node name="dungeon" type="Node2D"]
-script = SubResource( 1 )
+script = ExtResource( 3 )
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = SubResource( 2 )
