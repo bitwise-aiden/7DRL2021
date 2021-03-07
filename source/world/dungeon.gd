@@ -46,8 +46,8 @@ func draw_room(free_regions, spawn_player: bool):
 	var region = free_regions[randi() % free_regions.size()]
 
 	room_buffer = rooms_script.get_room_tiles()
-	var size_x = room_buffer[1].size()
-	var size_y = room_buffer[0].size()
+	var size_x = room_buffer[0].size()
+	var size_y = room_buffer.size()
 
 	var start_x = region.position.x
 	if region.size.x > size_x:
@@ -81,7 +81,6 @@ func draw_room(free_regions, spawn_player: bool):
 			elif(room_buffer[y][x] == "D"):
 				tile_map.set_cell(start_x + x, start_y + y, Tile.Door)
 			elif(room_buffer[y][x] == "P"):
-				print(spawn_player, Vector2(start_x + x, start_y + y))
 				if spawn_player:
 					self.emit_signal("spawn_player", Vector2(start_x + x, start_y + y))
 				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
@@ -175,3 +174,12 @@ func populate_traversable() -> void:
 
 func get_traversable() -> TileMap:
 	return self.traversable
+
+
+func get_room_for_entity(entity: EntityController) -> Rect2:
+	for room in rooms:
+		if room.has_point(entity.position):
+			return room
+
+	return Rect2(0.0, 0.0, 0.0, 0.0)
+

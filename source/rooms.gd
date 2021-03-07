@@ -20,6 +20,7 @@ func load_room(file):
 		var row = f.get_line()
 		room_array.append(row.rsplit(" "))
 	f.close()
+
 	return room_array
 
 

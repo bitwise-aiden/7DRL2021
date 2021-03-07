@@ -4,7 +4,6 @@ extends Camera2D
 # Lifecycle methods
 func _ready() -> void:
 	self.make_current()
-	Globals.camera_instance = self
 
 
 # Public methods
