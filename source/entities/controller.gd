@@ -2,6 +2,7 @@ class_name EntityController
 
 
 signal move(from, to)
+signal telegraph(from, to)
 signal debug(content)
 
 
