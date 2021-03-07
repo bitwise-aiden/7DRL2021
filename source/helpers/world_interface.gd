@@ -24,7 +24,7 @@ func has_line_of_sight(from: EntityController, to: EntityController) -> bool:
 
 
 func is_traversable(position: Vector2) -> bool:
-	return self.__world.get_cellv(position) == TileMap.INVALID_CELL
+	return self.__world.get_cellv(position) != TileMap.INVALID_CELL
 
 
 # Helper methods

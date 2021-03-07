@@ -1,4 +1,4 @@
-extends Node2D
+class_name Dungeon extends Node2D
 
 const ROOM_COUNT = [10, 15, 20, 30, 1] # Amount of rooms
 
@@ -35,14 +35,14 @@ func draw_level():
 
 	var free_regions = [Rect2(Vector2(2, 2), level_size - Vector2(4, 4))]
 	for i in range(room_count):
-		draw_room(free_regions)
+		draw_room(free_regions, i == 0)
 		if free_regions.empty():
 			break
 	draw_exit()
 	draw_path()
 
 # Draws all the rooms in the level 18x32-room size 24x38 to have 3 clear rows on each side?
-func draw_room(free_regions):
+func draw_room(free_regions, spawn_player: bool):
 	var region = free_regions[randi() % free_regions.size()]
 
 	room_buffer = rooms_script.get_room_tiles()
@@ -80,6 +80,14 @@ func draw_room(free_regions):
 				tile_map.set_cell(start_x + x, start_y + y, Tile.Corner)
 			elif(room_buffer[y][x] == "D"):
 				tile_map.set_cell(start_x + x, start_y + y, Tile.Door)
+			elif(room_buffer[y][x] == "P"):
+				print(spawn_player, Vector2(start_x + x, start_y + y))
+				if spawn_player:
+					self.emit_signal("spawn_player", Vector2(start_x + x, start_y + y))
+				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
+			elif(room_buffer[y][x] == "M"):
+				self.emit_signal("spawn_enemy", Vector2(start_x + x, start_y + y))
+				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
 			else:
 				# error tile so we can figure out if we missed something
 				tile_map.set_cell(start_x + x, start_y + y, Tile.Error)
@@ -147,7 +155,23 @@ func draw_path():
 		#tile_map.set_cellv(position, Tile.Error)
 
 # Called when the node enters the scene tree for the first time.
-func _ready():
-	randomize()
+func initialize():
 	draw_level()
+	populate_traversable()
 
+	self.emit_signal("load_complete")
+
+
+signal spawn_player(position)
+signal spawn_enemy(position)
+signal load_complete()
+
+onready var traversable: TileMap = $traversable
+
+func populate_traversable() -> void:
+	for tile in self.tile_map.get_used_cells_by_id(2):
+		self.traversable.set_cellv(tile, 0)
+
+
+func get_traversable() -> TileMap:
+	return self.traversable
