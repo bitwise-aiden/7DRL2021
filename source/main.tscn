@@ -1,27 +1,18 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://source/dungeon.gd" type="Script" id=1]
-[ext_resource path="res://source/dungeon.tscn" type="PackedScene" id=3]
-[ext_resource path="res://assets/art/temp_tileset.tres" type="TileSet" id=4]
-[ext_resource path="res://source/world.gd" type="Script" id=5]
+[ext_resource path="res://source/main.gd" type="Script" id=1]
+[ext_resource path="res://source/dungeon.tscn" type="PackedScene" id=2]
+[ext_resource path="res://assets/art/temp_tileset.tres" type="TileSet" id=3]
 
 [node name="main" type="Node2D"]
-script = ExtResource( 5 )
-
-[node name="dungeon" parent="." instance=ExtResource( 3 )]
 script = ExtResource( 1 )
 
-[node name="world" type="TileMap" parent="."]
-tile_set = ExtResource( 4 )
-cell_size = Vector2( 16, 16 )
-format = 1
-tile_data = PoolIntArray( 851986, 1, 0, 851987, 1, 0, 851988, 1, 0, 851989, 1, 0, 851990, 1, 0, 851991, 1, 0, 851992, 1, 0, 851993, 1, 0, 851994, 1, 0, 851995, 1, 0, 851996, 1, 0, 851997, 1, 0, 851998, 1, 0, 851999, 1, 0, 852000, 1, 0, 852001, 1, 0, 852002, 1, 0, 852003, 1, 0, 852004, 1, 0, 852005, 1, 0, 852006, 1, 0, 852007, 1, 0, 917522, 1, 0, 917543, 1, 0, 983058, 1, 0, 983079, 1, 0, 1048594, 1, 0, 1048615, 1, 0, 1114130, 1, 0, 1114145, 1, 0, 1114146, 1, 0, 1114147, 1, 0, 1114151, 1, 0, 1179666, 1, 0, 1179681, 1, 0, 1179683, 1, 0, 1179687, 1, 0, 1245202, 1, 0, 1245206, 1, 0, 1245207, 1, 0, 1245208, 1, 0, 1245217, 1, 0, 1245218, 1, 0, 1245219, 1, 0, 1245223, 1, 0, 1310738, 1, 0, 1310742, 1, 0, 1310744, 1, 0, 1310759, 1, 0, 1376274, 1, 0, 1376278, 1, 0, 1376279, 1, 0, 1376280, 1, 0, 1376295, 1, 0, 1441810, 1, 0, 1441831, 1, 0, 1507346, 1, 0, 1507367, 1, 0, 1572882, 1, 0, 1572903, 1, 0, 1638418, 1, 0, 1638419, 1, 0, 1638420, 1, 0, 1638421, 1, 0, 1638422, 1, 0, 1638423, 1, 0, 1638424, 1, 0, 1638425, 1, 0, 1638426, 1, 0, 1638427, 1, 0, 1638428, 1, 0, 1638429, 1, 0, 1638430, 1, 0, 1638431, 1, 0, 1638432, 1, 0, 1638433, 1, 0, 1638434, 1, 0, 1638435, 1, 0, 1638436, 1, 0, 1638437, 1, 0, 1638438, 1, 0, 1638439, 1, 0 )
+[node name="dungeon" parent="." instance=ExtResource( 2 )]
 
 [node name="entities" type="TileMap" parent="."]
-tile_set = ExtResource( 4 )
+tile_set = ExtResource( 3 )
 cell_size = Vector2( 16, 16 )
 format = 1
-tile_data = PoolIntArray( 1245211, 0, 0 )
 
 [node name="line_of_sight" type="RayCast2D" parent="."]
 enabled = true

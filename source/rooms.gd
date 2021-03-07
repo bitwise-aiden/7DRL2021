@@ -13,9 +13,9 @@ func get_room_tiles():
 func load_room(file):
 	var f = File.new()
 	f.open(file, File.READ)
-	
+
 	var room_array = []
-	
+
 	while not f.eof_reached():
 		var row = f.get_line()
 		room_array.append(row.rsplit(" "))
