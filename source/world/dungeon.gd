@@ -140,6 +140,7 @@ func draw_path():
 	# graphing all the door tiles
 	var door_graph = AStar2D.new()
 	var doors = tile_map.get_used_cells_by_id(5)
+			# update here so i'm able to get the id directly from the tile
 	var i = 1
 	for door in doors:
 		door_graph .add_point(i, door, 1.0)
@@ -147,14 +148,43 @@ func draw_path():
 	# graping all the ground tiles
 	var ground_graph = AStar2D.new()
 	var ground = tile_map.get_used_cells_by_id(4)
+			# update here so i'm able to get the id directly from the tile
 	var j = 1
 	for tile in ground:
 		ground_graph.add_point(j, tile, 1.0)
 		j += 1
+		
+	connect_points(ground_graph, ground)
+	connect_path(ground_graph, door_graph)
 
 	#var path = astar.get_point_path(point_one, point_two)
 	#for position in path:
 		#tile_map.set_cellv(position, Tile.Error)
+
+func connect_points(astar, tile_map_connect):
+	for tile in tile_map_connect:
+		# update here so i'm able to get the id directly from the tile
+		var point = tile
+		var point_coord = astar.get_point_position(point)
+		
+		for x in range(-1,1):
+			for y in range(-1,1):
+				var target = point_coord + Vector2(x, y)
+				var target_id = astar.get_id_for_point(target)
+				
+				if(point == target or not astar.has_point(target_id)):
+					continue
+					
+				astar.connect_points(point, target_id, true)
+				
+func connect_path(astar, doors):
+	var buffer_path
+	for door in doors:
+		var buffer_start_point = astar.get_closest_point(door)
+		var buffer_end_point = doors.get_closest_point(door)
+		buffer_end_point = astar.get_closest_point(buffer_end_point)
+		
+		buffer_path.append(astar.get_id_path(buffer_start_point, buffer_end_point))
 
 # Called when the node enters the scene tree for the first time.
 func initialize():
