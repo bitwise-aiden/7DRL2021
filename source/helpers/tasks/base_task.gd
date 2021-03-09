@@ -9,5 +9,5 @@ func is_completed() -> bool:
 	return self._completed
 
 
-func update(delta: float) -> void:
+func update(_delta: float) -> void:
 	self._completed = true

@@ -30,7 +30,7 @@ func _ready() -> void:
 	self.__dungeon.initialize()
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if !self.__can_update:
 		return
 
@@ -41,9 +41,9 @@ func _process(delta: float) -> void:
 func __center_camera_on_entity(entity: EntityController, pan: bool = false) -> void:
 	var room: Rect2 = self.__dungeon.get_room_for_entity(entity)
 	if room.size.length() == 0:
-		self.__center_camera_on_position(entity.position)
+		self.__center_camera_on_position(entity.position, pan)
 	else:
-		self.__center_camera_on_room(room)
+		self.__center_camera_on_room(room, pan)
 
 
 func __center_camera_on_position(position: Vector2, pan: bool = false) -> void:
