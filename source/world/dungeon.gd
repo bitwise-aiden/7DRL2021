@@ -1,6 +1,6 @@
 class_name Dungeon extends Node2D
 
-const ROOM_COUNT = [2, 15, 20, 30, 1] # Amount of rooms
+const ROOM_COUNT = [10, 15, 20, 30, 1] # Amount of rooms
 
 #Used tiles
 enum Tile {Wall, Exit, Floor, Corner, Background, Door, Error}
@@ -9,8 +9,9 @@ enum Tile {Wall, Exit, Floor, Corner, Background, Door, Error}
 # Var for this level
 var level_number = 0
 var map = []
-var room_buffer = []
+var portals = []
 var rooms = []
+var room_buffer = []
 var room_count
 var level_size
 var walls: Array
@@ -19,6 +20,7 @@ var exit: Vector2
 # Nodes
 onready var tile_map = $TileMap
 onready var rooms_script = $Rooms
+onready var line = $Line2D
 
 # Draws the level
 func draw_level():
@@ -39,7 +41,6 @@ func draw_level():
 		if free_regions.empty():
 			break
 	draw_exit()
-	draw_path()
 
 # Draws all the rooms in the level 18x32-room size 24x38 to have 3 clear rows on each side?
 func draw_room(free_regions, spawn_player: bool):
@@ -59,15 +60,6 @@ func draw_room(free_regions, spawn_player: bool):
 
 	var room = Rect2(start_x, start_y, size_x, size_y)
 	rooms.append(room)
-
-	# decide for random door placement
-	var door_check = 0
-	while(door_check < 1):
-		var r_y = randi() % int(room_buffer.size())
-		var r_x = randi() % int(room_buffer[0].size())
-		if(room_buffer[r_y][r_x] == "N" || room_buffer[r_y][r_x] == "E" || room_buffer[r_y][r_x] == "W" || room_buffer[r_y][r_x] == "S"):
-			room_buffer[r_y][r_x] = "D"
-			door_check += 1
 
 	# get tile-information from the room_buffer and set the tiles at the right spot.
 	for y in range(room_buffer.size()):
@@ -90,6 +82,9 @@ func draw_room(free_regions, spawn_player: bool):
 			elif(room_buffer[y][x] == 'G'):
 				self.emit_signal("spawn_pick_up", Vector2(start_x + x, start_y + y))
 				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
+			elif(room_buffer[y][x] == "T"):
+				tile_map.set_cell(start_x + x, start_y + y, Tile.Error)
+				portals.append(Vector2(start_x + x, start_y + y))
 			else:
 				# error tile so we can figure out if we missed something
 				tile_map.set_cell(start_x + x, start_y + y, Tile.Error)
@@ -135,70 +130,6 @@ func draw_exit():
 		var random = randi() % walls.size()
 		exit = walls[random]
 		tile_map.set_cellv(exit, Tile.Exit)
-
-func draw_path():
-	# graphing all the door tiles
-	var door_graph = AStar2D.new()
-	var doors = tile_map.get_used_cells_by_id(5)
-			# update here so i'm able to get the id directly from the tile
-	var i = 1
-	for door in doors:
-		door_graph.add_point(i, door, 1.0)
-		i += 1
-	# graping all the ground tiles
-	var ground_graph = AStar2D.new()
-	var ground = tile_map.get_used_cells_by_id(4)
-			# update here so i'm able to get the id directly from the tile
-	var j = 1
-	for tile in ground:
-		ground_graph.add_point(j, tile, 1.0)
-		j += 1
-		
-	connect_points(ground_graph, ground)
-	
-
-	for tile in doors:
-		var path = connect_path(ground_graph, door_graph, doors)
-		if(path != null):
-			for position_array in path:
-					for position in position_array:
-						tile_map.set_cellv(ground_graph.get_point_position(position), Tile.Error)
-
-func connect_points(astar, tile_map_connect):
-	var i = 0
-	for tile in tile_map_connect:
-		# update here so i'm able to get the id directly from the tile
-		var point_id = i
-		var point_coord = astar.get_point_position(point_id)
-		i += 1
-		for x in range(-1,1):
-			for y in range(-1,1):
-				var target_coord = point_coord + Vector2(x, y)
-				var target_id = get_id(target_coord, tile_map_connect)
-				
-				if(point_coord == target_coord or target_id == -1):
-					continue
-					
-				astar.connect_points(point_id, target_id, true)
-				
-func get_id(point_coord, tile_map_buffer):
-	var i = 0
-	for tile in tile_map_buffer:
-		if(point_coord == tile):
-			return i
-		i += 1
-	return -1
-				
-func connect_path(astar, tile_map_doors, doors):
-	var buffer_path = []
-	for door in doors:
-		var buffer_start_point = astar.get_closest_point(door)
-		var buffer_end_point = tile_map_doors.get_closest_point(door)
-		buffer_end_point = astar.get_closest_point(astar.get_point_position(buffer_end_point))
-		var buffer_buffer = astar.get_id_path(buffer_start_point, buffer_end_point)
-		if(buffer_buffer != null):
-			buffer_path.append(buffer_buffer)
-	return buffer_path
 
 # Called when the node enters the scene tree for the first time.
 func initialize():
