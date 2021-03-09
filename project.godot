@@ -44,6 +44,16 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://source/entities/controller.gd"
 }, {
+"base": "Reference",
+"class": "PickUp",
+"language": "GDScript",
+"path": "res://source/pick_up.gd"
+}, {
+"base": "EntityController",
+"class": "PickUpController",
+"language": "GDScript",
+"path": "res://source/entities/pick_up.gd"
+}, {
 "base": "EntityController",
 "class": "PlayerController",
 "language": "GDScript",
@@ -82,6 +92,8 @@ _global_script_class_icons={
 "EnemyJumper": "",
 "EnemyWanderer": "",
 "EntityController": "",
+"PickUp": "",
+"PickUpController": "",
 "PlayerController": "",
 "PlayerInput": "",
 "Task": "",
