@@ -8,7 +8,7 @@ var type: int = PickUp.Type.MAX
 func handle_collision(entity: EntityController) -> bool:
 	if entity is PlayerController:
 		entity.pick_up(self.type)
-		self.alive = false
+		self.emit_signal("remove")
 		return false
 
 	return true

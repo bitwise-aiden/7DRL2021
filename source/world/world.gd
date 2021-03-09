@@ -58,6 +58,15 @@ func __center_camera_on_room(room: Rect2, pan: bool = false) -> void:
 	self.__center_camera_on_position(room_center, pan)
 
 
+func __connect_entity(entity: EntityController) -> void:
+	if entity is PlayerController:
+		entity.connect("move", self, "__move_player", [entity])
+	elif entity is EnemyController:
+		entity.connect("move", self, "__move_entity", [entity])
+
+	entity.connect("remove", self, "__remove_entity", [entity])
+
+
 func __dungeon_complete() -> void:
 	self.__world_interface = WorldInterface.new(
 		self.__ray,
@@ -70,7 +79,7 @@ func __dungeon_complete() -> void:
 	self.__center_camera_on_entity(self.__player, false)
 
 
-func __entity_move(from: Vector2, to: Vector2, entity: EntityController) -> Vector2:
+func __move_entity(from: Vector2, to: Vector2, entity: EntityController) -> Vector2:
 	var last_position: Vector2 = from
 	var direction = to - from
 	var distance = direction.length()
@@ -93,13 +102,10 @@ func __entity_move(from: Vector2, to: Vector2, entity: EntityController) -> Vect
 	return last_position
 
 
-func __player_move(from: Vector2, to: Vector2, entity: EntityController) -> void:
+func __move_player(from: Vector2, to: Vector2, entity: EntityController) -> void:
 	self.__can_update = false
 
-	var position_player: Vector2 = yield(
-		self.__entity_move(from, to, entity),
-		"completed"
-	)
+	yield(self.__move_entity(from, to, entity), "completed")
 
 	self.__center_camera_on_entity(entity)
 
@@ -110,10 +116,21 @@ func __player_move(from: Vector2, to: Vector2, entity: EntityController) -> void
 	self.__can_update = true
 
 
+func __remove_entity(entity: EntityController) -> void:
+	var index = self.__entities.find(entity)
+	if index == -1:
+		Logger.warn("Could not remove entity, doesn't belong in entites array")
+		return
+
+	self.__entities.remove(index)
+
+	self.__entities_map.set_cellv(entity.position, TileMap.INVALID_CELL)
+
+
 func __spawn_enemy(position: Vector2) -> void:
 	var enemy = EnemyController.new()
 	enemy.initialize(position, self.HEALTH_ENEMY, self.DAMAGE_ENEMY)
-	enemy.connect("move", self, "__entity_move", [enemy])
+	self.__connect_entity(enemy)
 
 	self.__entities_map.set_cellv(position, 0)
 	self.__entities.append(enemy)
@@ -124,6 +141,7 @@ func __spawn_enemy(position: Vector2) -> void:
 func __spawn_pick_up(position: Vector2) -> void:
 	var pick_up = PickUpController.new()
 	pick_up.initialize(position)
+	self.__connect_entity(pick_up)
 
 	self.__entities_map.set_cellv(position, 1)
 	self.__entities.append(pick_up)
@@ -136,7 +154,7 @@ func __spawn_player(position: Vector2) -> void:
 
 	self.__player = PlayerController.new()
 	self.__player.initialize(position, self.HEALTH_PLAYER, self.DAMAGE_PLAYER)
-	self.__player.connect("move", self, "__player_move", [self.__player])
+	self.__connect_entity(self.__player)
 
 	self.__entities_map.set_cellv(position, 0)
 	self.__entities.append(self.__player)
