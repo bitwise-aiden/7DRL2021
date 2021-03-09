@@ -2,6 +2,7 @@ class_name EntityController
 
 
 signal move(from, to)
+signal remove()
 signal telegraph(from, to)
 signal debug(content)
 
@@ -23,7 +24,7 @@ func initialize(position: Vector2, health_max: int = 1, damage: int = 1) -> void
 	self._initialize()
 
 
-func handle_collision(entity: EntityController) -> bool:
+func handle_collision(_entity: EntityController) -> bool:
 	return true
 
 

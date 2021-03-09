@@ -1,8 +1,6 @@
 extends Node
 
 
-signal setting_changed(name, value)
-
 const SETTINGS_PATH = "settings.json"
 
 var __settings: Dictionary = {}
@@ -18,7 +16,6 @@ var __settings_default: Dictionary = {
 
 # Lifecycle methods
 func _ready() -> void:
-	self.connect("setting_changed", self, "__setting_changed")
 	self.__settings = self.__settings_default
 
 	if FileManager.file_exists(self.SETTINGS_PATH):

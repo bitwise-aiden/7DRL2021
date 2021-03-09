@@ -74,7 +74,7 @@ class RunFunc:
 		self.__function = function
 
 
-	func update(delta: float) -> void:
+	func update(_delta: float) -> void:
 		self.__function.call_funcv(self.__arguments)
 		self._completed = true
 
@@ -110,7 +110,7 @@ class WaitForFunc:
 		self.__function = function
 
 
-	func update(delta: float) -> void:
+	func update(_delta: float) -> void:
 		self._completed = self.__function.call_funcv(self.__arguments)
 
 
@@ -125,5 +125,5 @@ class WaitForTask:
 		self.__task = task
 
 
-	func update(delta: float) -> void:
+	func update(_delta: float) -> void:
 		self._completed = self.__task.is_completed()
