@@ -143,3 +143,5 @@ format = 1
 
 [node name="Rooms" type="Node" parent="."]
 script = ExtResource( 4 )
+
+[node name="Line2D" type="Line2D" parent="."]
