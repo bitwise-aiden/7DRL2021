@@ -1,13 +1,19 @@
 class_name WorldController extends Node2D
 
 
+const DAMAGE_ENEMY = 1
+const DAMAGE_PLAYER = 1
+const HEALTH_ENEMY = 1
+const HEALTH_PLAYER = 3
+
 onready var __camera: Camera2D = $camera
 onready var __dungeon: Dungeon = $dungeon
-onready var __entities: TileMap = $entities
+onready var __entities_map: TileMap = $entities
 onready var __ray: RayCast2D = $line_of_sight
 
 var __can_update: bool = false
 var __enemies: Array = []
+var __entities: Array = []
 var __player: PlayerController = null
 var __world_interface: WorldInterface = null
 
@@ -18,6 +24,7 @@ func _ready() -> void:
 
 	self.__dungeon.connect("load_complete", self, "__dungeon_complete")
 	self.__dungeon.connect("spawn_enemy", self, "__spawn_enemy")
+	self.__dungeon.connect("spawn_pick_up", self, "__spawn_pick_up")
 	self.__dungeon.connect("spawn_player", self, "__spawn_player")
 
 	self.__dungeon.initialize()
@@ -54,7 +61,8 @@ func __center_camera_on_room(room: Rect2, pan: bool = false) -> void:
 func __dungeon_complete() -> void:
 	self.__world_interface = WorldInterface.new(
 		self.__ray,
-		self.__dungeon.get_traversable()
+		self.__dungeon.get_traversable(),
+		self.__entities
 	)
 
 	self.__can_update = true
@@ -72,12 +80,12 @@ func __entity_move(from: Vector2, to: Vector2, entity: EntityController) -> Vect
 
 		yield(self.get_tree().create_timer(0.1), "timeout")
 
-		if !self.__world_interface.is_traversable(from + offset):
+		if !self.__world_interface.can_traverse(entity, from + offset):
 			break
 
-		self.__entities.set_cellv(last_position, TileMap.INVALID_CELL)
+		self.__entities_map.set_cellv(last_position, TileMap.INVALID_CELL)
 		last_position = from + offset
-		self.__entities.set_cellv(last_position, 0)
+		self.__entities_map.set_cellv(last_position, 0)
 
 	if last_position != to:
 		entity.position = last_position
@@ -104,12 +112,21 @@ func __player_move(from: Vector2, to: Vector2, entity: EntityController) -> void
 
 func __spawn_enemy(position: Vector2) -> void:
 	var enemy = EnemyController.new()
-	enemy.initialize(position)
+	enemy.initialize(position, self.HEALTH_ENEMY, self.DAMAGE_ENEMY)
 	enemy.connect("move", self, "__entity_move", [enemy])
 
-	self.__entities.set_cellv(position, 0)
+	self.__entities_map.set_cellv(position, 0)
+	self.__entities.append(enemy)
 
 	self.__enemies.append(enemy)
+
+
+func __spawn_pick_up(position: Vector2) -> void:
+	var pick_up = PickUpController.new()
+	pick_up.initialize(position)
+
+	self.__entities_map.set_cellv(position, 1)
+	self.__entities.append(pick_up)
 
 
 func __spawn_player(position: Vector2) -> void:
@@ -118,7 +135,8 @@ func __spawn_player(position: Vector2) -> void:
 		return
 
 	self.__player = PlayerController.new()
-	self.__player.initialize(position)
+	self.__player.initialize(position, self.HEALTH_PLAYER, self.DAMAGE_PLAYER)
 	self.__player.connect("move", self, "__player_move", [self.__player])
 
-	self.__entities.set_cellv(position, 0)
+	self.__entities_map.set_cellv(position, 0)
+	self.__entities.append(self.__player)

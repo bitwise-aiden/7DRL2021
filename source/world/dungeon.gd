@@ -87,6 +87,9 @@ func draw_room(free_regions, spawn_player: bool):
 			elif(room_buffer[y][x] == "M"):
 				self.emit_signal("spawn_enemy", Vector2(start_x + x, start_y + y))
 				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
+			elif(room_buffer[y][x] == 'G'):
+				self.emit_signal("spawn_pick_up", Vector2(start_x + x, start_y + y))
+				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
 			else:
 				# error tile so we can figure out if we missed something
 				tile_map.set_cell(start_x + x, start_y + y, Tile.Error)
@@ -161,9 +164,10 @@ func initialize():
 	self.emit_signal("load_complete")
 
 
-signal spawn_player(position)
-signal spawn_enemy(position)
 signal load_complete()
+signal spawn_enemy(position)
+signal spawn_pick_up(position)
+signal spawn_player(position)
 
 onready var traversable: TileMap = $traversable
 

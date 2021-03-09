@@ -1,12 +1,14 @@
 class_name WorldInterface
 
 
+var __entities: Array = []
 var __ray: RayCast2D = null
 var __world: TileMap = null
 
 
 # Lifecycle methods
-func _init(ray: RayCast2D, world: TileMap) -> void:
+func _init(ray: RayCast2D, world: TileMap, entities: Array) -> void:
+	self.__entities = entities
 	self.__ray = ray
 	self.__world = world
 
@@ -23,11 +25,21 @@ func has_line_of_sight(from: EntityController, to: EntityController) -> bool:
 	return !self.__ray.is_colliding()
 
 
-func is_traversable(position: Vector2) -> bool:
-	return self.__world.get_cellv(position) != TileMap.INVALID_CELL
+func can_traverse(entity: EntityController, position: Vector2) -> bool:
+	if self.__world.get_cellv(position) == TileMap.INVALID_CELL:
+		return false
 
+	for other_entity in self.__entities:
+		if entity == other_entity:
+			continue
 
-# Helper methods
+		if other_entity.position != position:
+			continue
+
+		return !other_entity.handle_collision(entity)
+
+	return true
+
 
 # s2w: Converts the Vector2 from screen space to world space
 func s2w(value: Vector2) -> Vector2:
