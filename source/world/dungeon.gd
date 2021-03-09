@@ -1,6 +1,6 @@
 class_name Dungeon extends Node2D
 
-const ROOM_COUNT = [10, 15, 20, 30, 1] # Amount of rooms
+const ROOM_COUNT = [2, 15, 20, 30, 1] # Amount of rooms
 
 #Used tiles
 enum Tile {Wall, Exit, Floor, Corner, Background, Door, Error}
@@ -26,7 +26,7 @@ func draw_level():
 	tile_map.clear()
 
 	room_count = ROOM_COUNT[level_number]
-	level_size = Vector2(room_count * 10, room_count * 10) # Fix this so it's not hard coded
+	level_size = Vector2(room_count * 40, room_count * 24) # Fix this so it's not hard coded
 	for x in range(level_size.x):
 		map.append([])
 		for y in range(level_size.y):
@@ -143,7 +143,7 @@ func draw_path():
 			# update here so i'm able to get the id directly from the tile
 	var i = 1
 	for door in doors:
-		door_graph .add_point(i, door, 1.0)
+		door_graph.add_point(i, door, 1.0)
 		i += 1
 	# graping all the ground tiles
 	var ground_graph = AStar2D.new()
@@ -155,36 +155,50 @@ func draw_path():
 		j += 1
 		
 	connect_points(ground_graph, ground)
-	connect_path(ground_graph, door_graph)
+	
 
-	#var path = astar.get_point_path(point_one, point_two)
-	#for position in path:
-		#tile_map.set_cellv(position, Tile.Error)
+	for tile in doors:
+		var path = connect_path(ground_graph, door_graph, doors)
+		if(path != null):
+			for position_array in path:
+					for position in position_array:
+						tile_map.set_cellv(ground_graph.get_point_position(position), Tile.Error)
 
 func connect_points(astar, tile_map_connect):
+	var i = 0
 	for tile in tile_map_connect:
 		# update here so i'm able to get the id directly from the tile
-		var point = tile
-		var point_coord = astar.get_point_position(point)
-		
+		var point_id = i
+		var point_coord = astar.get_point_position(point_id)
+		i += 1
 		for x in range(-1,1):
 			for y in range(-1,1):
-				var target = point_coord + Vector2(x, y)
-				var target_id = astar.get_id_for_point(target)
+				var target_coord = point_coord + Vector2(x, y)
+				var target_id = get_id(target_coord, tile_map_connect)
 				
-				if(point == target or not astar.has_point(target_id)):
+				if(point_coord == target_coord or target_id == -1):
 					continue
 					
-				astar.connect_points(point, target_id, true)
+				astar.connect_points(point_id, target_id, true)
 				
-func connect_path(astar, doors):
-	var buffer_path
+func get_id(point_coord, tile_map_buffer):
+	var i = 0
+	for tile in tile_map_buffer:
+		if(point_coord == tile):
+			return i
+		i += 1
+	return -1
+				
+func connect_path(astar, tile_map_doors, doors):
+	var buffer_path = []
 	for door in doors:
 		var buffer_start_point = astar.get_closest_point(door)
-		var buffer_end_point = doors.get_closest_point(door)
-		buffer_end_point = astar.get_closest_point(buffer_end_point)
-		
-		buffer_path.append(astar.get_id_path(buffer_start_point, buffer_end_point))
+		var buffer_end_point = tile_map_doors.get_closest_point(door)
+		buffer_end_point = astar.get_closest_point(astar.get_point_position(buffer_end_point))
+		var buffer_buffer = astar.get_id_path(buffer_start_point, buffer_end_point)
+		if(buffer_buffer != null):
+			buffer_path.append(buffer_buffer)
+	return buffer_path
 
 # Called when the node enters the scene tree for the first time.
 func initialize():
