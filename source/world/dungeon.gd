@@ -3,7 +3,7 @@ class_name Dungeon extends Node2D
 const ROOM_COUNT = [10, 15, 20, 30, 1] # Amount of rooms
 
 #Used tiles
-enum Tile {NWest, North, NEast, West, Floor, East, SWest, South, SEast, Ground, Teleport}
+enum Tile {NW, N, NE, W, F, E, SW, S, SE, T, P, G}
 
 
 # Var for this level
@@ -18,9 +18,9 @@ var walls: Array
 var exit: Vector2
 
 # Nodes
-onready var tile_map = $TileMap
+onready var tile_map = $TileMap_Level
 onready var rooms_script = $Rooms
-onready var line = $Line2D
+onready var tile_map_things = $TileMap_Things
 
 # Draws the level
 func draw_level():
@@ -32,8 +32,8 @@ func draw_level():
 	for x in range(level_size.x):
 		map.append([])
 		for y in range(level_size.y):
-			map[x].append(Tile.Ground)
-			tile_map.set_cell(x, y, Tile.Ground)
+			map[x].append(Tile.G)
+			tile_map.set_cell(x, y, Tile.G)
 
 	var free_regions = [Rect2(Vector2(2, 2), level_size - Vector2(4, 4))]
 	for i in range(room_count):
@@ -64,40 +64,41 @@ func draw_room(free_regions, spawn_player: bool):
 	for y in range(room_buffer.size()):
 		for x in range(room_buffer[y - 1].size()):
 			if(room_buffer[y][x] == "NW"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.NWest)
+				tile_map.set_cell(start_x + x, start_y + y, Tile.NW)
 			elif(room_buffer[y][x] == "N"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.North)	
+				tile_map.set_cell(start_x + x, start_y + y, Tile.N)	
 			elif(room_buffer[y][x] == "NE"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.NEast)	
+				tile_map.set_cell(start_x + x, start_y + y, Tile.NE)	
 			elif(room_buffer[y][x] == "W"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.West)	
+				tile_map.set_cell(start_x + x, start_y + y, Tile.W)	
 			elif(room_buffer[y][x] == "F"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)	
+				tile_map.set_cell(start_x + x, start_y + y, Tile.F)	
 			elif(room_buffer[y][x] == "E"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.East)	
+				tile_map.set_cell(start_x + x, start_y + y, Tile.E)	
 			elif(room_buffer[y][x] == "SW"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.SWest)	
+				tile_map.set_cell(start_x + x, start_y + y, Tile.SW)	
 			elif(room_buffer[y][x] == "S"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.South)	
+				tile_map.set_cell(start_x + x, start_y + y, Tile.S)	
 			elif(room_buffer[y][x] == "SE"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.SEast)	
+				tile_map.set_cell(start_x + x, start_y + y, Tile.SE)	
 			elif(room_buffer[y][x] == "P"):
 				if spawn_player:
 					self.emit_signal("spawn_player", Vector2(start_x + x, start_y + y))
-				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
+				tile_map.set_cell(start_x + x, start_y + y, Tile.F)
+				tile_map_things.set_cell(start_x + x, start_y + y, Tile.P)
 			elif(room_buffer[y][x] == "M"):
 				self.emit_signal("spawn_enemy", Vector2(start_x + x, start_y + y))
-				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
+				tile_map.set_cell(start_x + x, start_y + y, Tile.F)
 			elif(room_buffer[y][x] == 'G'):
 				self.emit_signal("spawn_pick_up", Vector2(start_x + x, start_y + y))
-				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
+				tile_map.set_cell(start_x + x, start_y + y, Tile.F)
 			elif(room_buffer[y][x] == "T"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
-				tile_map.set_cell(start_x + x, start_y + y, Tile.Teleport)
+				tile_map.set_cell(start_x + x, start_y + y, Tile.F)
+				tile_map_things.set_cell(start_x + x, start_y + y, Tile.T)
 				portals.append(Vector2(start_x + x, start_y + y))
 			else:
 				# error tile so we can figure out if we missed something
-				tile_map.set_cell(start_x + x, start_y + y, Tile.North)
+				tile_map.set_cell(start_x + x, start_y + y, Tile.N)
 
 	# split up the remaining free areas
 	cut_regions(free_regions, room)
