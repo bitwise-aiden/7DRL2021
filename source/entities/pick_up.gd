@@ -6,7 +6,7 @@ var type: int = PickUp.Type.MAX
 
 # Lifecycle methods
 func _init(position: Vector2, options: Dictionary = {}).(position, options) -> void:
-	pass
+	self.type = randi() % PickUp.Type.MAX
 
 
 # Public methods
@@ -17,8 +17,3 @@ func handle_collision(entity: EntityController) -> bool:
 		return false
 
 	return true
-
-
-# Protected methods
-func _initialize() -> void:
-	self.type = randi() % PickUp.Type.MAX
