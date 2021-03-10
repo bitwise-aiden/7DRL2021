@@ -3,7 +3,7 @@ class_name Dungeon extends Node2D
 const ROOM_COUNT = [10, 15, 20, 30, 1] # Amount of rooms
 
 #Used tiles
-enum Tile {Wall, Exit, Floor, Corner, Background, Door, Error}
+enum Tile {NWest, North, NEast, West, Floor, East, SWest, South, SEast, Ground, Teleport}
 
 
 # Var for this level
@@ -28,19 +28,18 @@ func draw_level():
 	tile_map.clear()
 
 	room_count = ROOM_COUNT[level_number]
-	level_size = Vector2(room_count * 40, room_count * 24) # Fix this so it's not hard coded
+	level_size = Vector2(room_count * 20, room_count * 24) # Fix this so it's not hard coded
 	for x in range(level_size.x):
 		map.append([])
 		for y in range(level_size.y):
-			map[x].append(Tile.Background)
-			tile_map.set_cell(x, y, Tile.Background)
+			map[x].append(Tile.Ground)
+			tile_map.set_cell(x, y, Tile.Ground)
 
 	var free_regions = [Rect2(Vector2(2, 2), level_size - Vector2(4, 4))]
 	for i in range(room_count):
 		draw_room(free_regions, i == 0)
 		if free_regions.empty():
 			break
-	draw_exit()
 
 # Draws all the rooms in the level 18x32-room size 24x38 to have 3 clear rows on each side?
 func draw_room(free_regions, spawn_player: bool):
@@ -64,14 +63,24 @@ func draw_room(free_regions, spawn_player: bool):
 	# get tile-information from the room_buffer and set the tiles at the right spot.
 	for y in range(room_buffer.size()):
 		for x in range(room_buffer[y - 1].size()):
-			if(room_buffer[y][x] == "N" || room_buffer[y][x] == "E" || room_buffer[y][x] == "W" || room_buffer[y][x] == "S"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.Wall)
+			if(room_buffer[y][x] == "NW"):
+				tile_map.set_cell(start_x + x, start_y + y, Tile.NWest)
+			elif(room_buffer[y][x] == "N"):
+				tile_map.set_cell(start_x + x, start_y + y, Tile.North)	
+			elif(room_buffer[y][x] == "NE"):
+				tile_map.set_cell(start_x + x, start_y + y, Tile.NEast)	
+			elif(room_buffer[y][x] == "W"):
+				tile_map.set_cell(start_x + x, start_y + y, Tile.West)	
 			elif(room_buffer[y][x] == "F"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
-			elif(room_buffer[y][x] == "NE" || room_buffer[y][x] == "NW" || room_buffer[y][x] == "SW" || room_buffer[y][x] == "SE"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.Corner)
-			elif(room_buffer[y][x] == "D"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.Door)
+				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)	
+			elif(room_buffer[y][x] == "E"):
+				tile_map.set_cell(start_x + x, start_y + y, Tile.East)	
+			elif(room_buffer[y][x] == "SW"):
+				tile_map.set_cell(start_x + x, start_y + y, Tile.SWest)	
+			elif(room_buffer[y][x] == "S"):
+				tile_map.set_cell(start_x + x, start_y + y, Tile.South)	
+			elif(room_buffer[y][x] == "SE"):
+				tile_map.set_cell(start_x + x, start_y + y, Tile.SEast)	
 			elif(room_buffer[y][x] == "P"):
 				if spawn_player:
 					self.emit_signal("spawn_player", Vector2(start_x + x, start_y + y))
@@ -83,11 +92,12 @@ func draw_room(free_regions, spawn_player: bool):
 				self.emit_signal("spawn_pick_up", Vector2(start_x + x, start_y + y))
 				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
 			elif(room_buffer[y][x] == "T"):
-				tile_map.set_cell(start_x + x, start_y + y, Tile.Error)
+				tile_map.set_cell(start_x + x, start_y + y, Tile.Floor)
+				tile_map.set_cell(start_x + x, start_y + y, Tile.Teleport)
 				portals.append(Vector2(start_x + x, start_y + y))
 			else:
 				# error tile so we can figure out if we missed something
-				tile_map.set_cell(start_x + x, start_y + y, Tile.Error)
+				tile_map.set_cell(start_x + x, start_y + y, Tile.North)
 
 	# split up the remaining free areas
 	cut_regions(free_regions, room)
@@ -122,14 +132,6 @@ func cut_regions(free_regions, region_to_cut):
 
 	for region in addition_queue:
 		free_regions.append(region)
-
-# Draws the exit randomly on any wall in the level
-func draw_exit():
-	walls = tile_map.get_used_cells_by_id(0)
-	if(walls.size() != 0):
-		var random = randi() % walls.size()
-		exit = walls[random]
-		tile_map.set_cellv(exit, Tile.Exit)
 
 # Called when the node enters the scene tree for the first time.
 func initialize():
