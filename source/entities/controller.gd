@@ -21,8 +21,6 @@ func _init(position: Vector2, options: Dictionary = {}) -> void:
 	self.health = self.health_max
 	self.position = position
 
-	self._initialize()
-
 
 func handle_collision(_entity: EntityController) -> bool:
 	return true
@@ -33,9 +31,4 @@ func is_alive() -> bool:
 
 
 func update() -> void:
-	pass
-
-
-# Protected methods
-func _initialize() -> void:
 	pass
