@@ -1,7 +1,12 @@
 class_name EnemyController extends EntityController
 
 
-# Public functions
+# Lifecycle methods
+func _init(position: Vector2, options: Dictionary = {}).(position, options) -> void:
+	pass
+
+
+# Public methods
 func handle_collision(entity: EntityController) -> bool:
 	if entity is PlayerController:
 		self.emit_signal("remove")

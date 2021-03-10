@@ -9,6 +9,11 @@ const INPUT_MAP = {
 }
 
 
+# Lifecycle methods
+func _init(position: Vector2, options: Dictionary = {}).(position, options) -> void:
+	pass
+
+
 # Public methods
 func pick_up(type: int) -> void:
 	match type:
