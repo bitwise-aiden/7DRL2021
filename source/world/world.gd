@@ -41,6 +41,7 @@ func _process(_delta: float) -> void:
 # Private methods
 func __attack_entity(entity: EntityController) -> void:
 	var options: Dictionary = {
+		'damage': entity.damage,
 		'direction': entity.direction,
 		'speed': 2
 	}
