@@ -8,7 +8,7 @@ func _init(position: Vector2, options: Dictionary = {}).(position, options) -> v
 
 # Public methods
 func handle_collision(entity: EntityController) -> bool:
-	if entity is PlayerController:
+	if entity is PlayerController || entity is ProjectileController:
 		self.emit_signal("remove")
 
 	return true

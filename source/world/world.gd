@@ -11,6 +11,7 @@ onready var __dungeon: Dungeon = $dungeon
 onready var __entities_map: TileMap = $entities
 onready var __ray: RayCast2D = $line_of_sight
 
+var __attacks: Array = []
 var __can_update: bool = false
 var __enemies: Array = []
 var __entities: Array = []
@@ -38,6 +39,18 @@ func _process(_delta: float) -> void:
 
 
 # Private methods
+func __attack_entity(entity: EntityController) -> void:
+	var options: Dictionary = {
+		'direction': entity.direction,
+		'speed': 2
+	}
+	var projectile: ProjectileController = ProjectileController.new(entity.position, options)
+	self.__connect_entity(projectile)
+
+	self.__entities.append(projectile)
+	self.__attacks.append(projectile)
+
+
 func __center_camera_on_entity(entity: EntityController, pan: bool = false) -> void:
 	var room: Rect2 = self.__dungeon.get_room_for_entity(entity)
 	if room.size.length() == 0:
@@ -61,7 +74,8 @@ func __center_camera_on_room(room: Rect2, pan: bool = false) -> void:
 func __connect_entity(entity: EntityController) -> void:
 	if entity is PlayerController:
 		entity.connect("move", self, "__move_player", [entity])
-	elif entity is EnemyController:
+		entity.connect("attack", self, "__attack_entity", [entity])
+	else:
 		entity.connect("move", self, "__move_entity", [entity])
 
 	entity.connect("remove", self, "__remove_entity", [entity])
@@ -90,6 +104,8 @@ func __move_entity(from: Vector2, to: Vector2, entity: EntityController) -> Vect
 		yield(self.get_tree().create_timer(0.1), "timeout")
 
 		if !self.__world_interface.can_traverse(entity, from + offset):
+			if entity is ProjectileController:
+				entity.call_deferred("emit_signal", "remove")
 			break
 
 		self.__entities_map.set_cellv(last_position, TileMap.INVALID_CELL)
@@ -109,6 +125,9 @@ func __move_player(from: Vector2, to: Vector2, entity: EntityController) -> void
 
 	self.__center_camera_on_entity(entity)
 
+	for attack in self.__attacks:
+		attack.update()
+
 	for enemy in self.__enemies:
 		enemy.update()
 		enemy.telegraph(entity, self.__world_interface)
@@ -123,6 +142,11 @@ func __remove_entity(entity: EntityController) -> void:
 		return
 
 	self.__entities.remove(index)
+
+	if entity is EnemyController:
+		self.__enemies.erase(entity)
+	elif entity is ProjectileController:
+		self.__attacks.erase(entity)
 
 	self.__entities_map.set_cellv(entity.position, TileMap.INVALID_CELL)
 
@@ -154,7 +178,7 @@ func __spawn_player(position: Vector2) -> void:
 		Logger.warn("Player already spawned")
 		return
 
-	var options = {
+	var options: Dictionary = {
 		'damage': self.DAMAGE_PLAYER,
 		'health': self.HEALTH_PLAYER
 	}
