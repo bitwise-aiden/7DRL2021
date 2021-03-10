@@ -1,6 +1,9 @@
 class_name PlayerController extends EntityController
 
 
+signal attack(direction)
+
+
 const INPUT_MAP = {
 	"up": Vector2.UP,
 	"down": Vector2.DOWN,
@@ -30,7 +33,11 @@ func update() -> void:
 	for input in self.INPUT_MAP.keys():
 		if Input.is_action_just_pressed(input):
 			var from = self.position
-			self.position += self.INPUT_MAP[input]
+			self.direction = self.INPUT_MAP[input]
+			self.position += self.direction
 
 			self.emit_signal("move", from, self.position)
 			break
+
+	if Input.is_action_just_pressed("attack"):
+		self.emit_signal("attack")

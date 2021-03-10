@@ -21,7 +21,8 @@ var input: Dictionary = {
 	"up": InputKey.new(KEY_UP),
 	"down": InputKey.new(KEY_DOWN),
 	"left": InputKey.new(KEY_LEFT),
-	"right": InputKey.new(KEY_RIGHT)
+	"right": InputKey.new(KEY_RIGHT),
+	"attack": InputKey.new(KEY_F)
 }
 
 var __used_keys: Dictionary  = {
