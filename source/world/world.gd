@@ -128,8 +128,11 @@ func __remove_entity(entity: EntityController) -> void:
 
 
 func __spawn_enemy(position: Vector2) -> void:
-	var enemy = EnemyController.new()
-	enemy.initialize(position, self.HEALTH_ENEMY, self.DAMAGE_ENEMY)
+	var options: Dictionary = {
+		'damage': self.DAMAGE_ENEMY,
+		'health': self.HEALTH_ENEMY
+	}
+	var enemy: EnemyController = EnemyController.new(position, options)
 	self.__connect_entity(enemy)
 
 	self.__entities_map.set_cellv(position, 0)
@@ -139,8 +142,7 @@ func __spawn_enemy(position: Vector2) -> void:
 
 
 func __spawn_pick_up(position: Vector2) -> void:
-	var pick_up = PickUpController.new()
-	pick_up.initialize(position)
+	var pick_up: PickUpController = PickUpController.new(position)
 	self.__connect_entity(pick_up)
 
 	self.__entities_map.set_cellv(position, 1)
@@ -152,8 +154,11 @@ func __spawn_player(position: Vector2) -> void:
 		Logger.warn("Player already spawned")
 		return
 
-	self.__player = PlayerController.new()
-	self.__player.initialize(position, self.HEALTH_PLAYER, self.DAMAGE_PLAYER)
+	var options = {
+		'damage': self.DAMAGE_PLAYER,
+		'health': self.HEALTH_PLAYER
+	}
+	self.__player = PlayerController.new(position, options)
 	self.__connect_entity(self.__player)
 
 	self.__entities_map.set_cellv(position, 0)

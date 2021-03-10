@@ -15,10 +15,10 @@ var position: Vector2 = Vector2.ZERO
 
 
 # Public methods
-func initialize(position: Vector2, health_max: int = 1, damage: int = 1) -> void:
-	self.damage = damage
-	self.health_max = health_max
-	self.health = health_max
+func _init(position: Vector2, options: Dictionary = {}) -> void:
+	self.damage = options.get('damage', self.damage)
+	self.health_max = options.get('health', self.health_max)
+	self.health = self.health_max
 	self.position = position
 
 	self._initialize()
